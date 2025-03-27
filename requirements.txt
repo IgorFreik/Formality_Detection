@@ -1,0 +1,12 @@
+pandas
+torch
+transformers==4.30.0
+spacy
+nltk
+textstat
+lexical-diversity
+empath
+readability
+scikit-learn
+
+
