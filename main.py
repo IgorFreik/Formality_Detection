@@ -1,6 +1,6 @@
 import os
 import json
-from formality_detection import (
+from formality_detector import (
     OpenAIFormalityDetector,
     HuggingFaceFormalityDetector,
     RuleBasedDetector
