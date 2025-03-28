@@ -1,0 +1,45 @@
+FALSE POSITIVES:
+---------------
+Text: # President Roosevelt once rode his horse 100 miles .
+True Label: 0
+Predicted Label: 1
+---
+Text: A holy soul .
+True Label: 0
+Predicted Label: 1
+---
+Text: Hinduism in India .
+True Label: 0
+Predicted Label: 1
+---
+Text: Until , that is , they become a hazard to others .
+True Label: 0
+Predicted Label: 1
+---
+Text: I WILL PRAY FOR HER
+True Label: 0
+Predicted Label: 1
+---
+
+FALSE NEGATIVES:
+---------------
+Text: Fifth , Scientology has a warped code of ethics .
+True Label: 1
+Predicted Label: 0
+---
+Text: No , he is a slave to the interpretations of the modern idiot/evangelist .
+True Label: 1
+Predicted Label: 0
+---
+Text: And the companies usually pay for ads on a `` per impression '' basis .
+True Label: 1
+Predicted Label: 0
+---
+Text: There you will see all your questions listed .
+True Label: 1
+Predicted Label: 0
+---
+Text: Which society are you talking about ?
+True Label: 1
+Predicted Label: 0
+---

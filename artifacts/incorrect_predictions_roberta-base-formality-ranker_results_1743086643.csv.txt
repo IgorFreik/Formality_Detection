@@ -1,0 +1,45 @@
+FALSE POSITIVES:
+---------------
+Text: Eat more carrots and it will make your eyes healthier .
+True Label: 0
+Predicted Label: 1
+---
+Text: Divorce your husband !
+True Label: 0
+Predicted Label: 1
+---
+Text: When the page loads , scroll down and chooze yur catogories then sub catogories .
+True Label: 0
+Predicted Label: 1
+---
+Text: Instead of having lots of food at the reception , have a tea party/reception .
+True Label: 0
+Predicted Label: 1
+---
+Text: Now do the same thing at the point ( -3,0 ) .
+True Label: 0
+Predicted Label: 1
+---
+
+FALSE NEGATIVES:
+---------------
+Text: Reward him when he goes out side .
+True Label: 1
+Predicted Label: 0
+---
+Text: Bring the stew just to a simmer .
+True Label: 1
+Predicted Label: 0
+---
+Text: God Bless you .
+True Label: 1
+Predicted Label: 0
+---
+Text: You are right .
+True Label: 1
+Predicted Label: 0
+---
+Text: The 21.5" iMac doesn't support video input and provides simpler NVIDIA GeForce 9400M graphics, the same as Apple's MacBook line and Mac mini.
+True Label: 1
+Predicted Label: 0
+---

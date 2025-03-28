@@ -1,0 +1,45 @@
+FALSE POSITIVES:
+---------------
+Text: can YOU see without rose - colored glasses ?
+True Label: 0
+Predicted Label: 1
+---
+Text: I hope my kids are that motivated in 9th grade .
+True Label: 0
+Predicted Label: 1
+---
+Text: Sneezing , coughing , runny watery eyes or eyes fille with pus .
+True Label: 0
+Predicted Label: 1
+---
+Text: My sisters pregnancy 's were different and she had one of each .
+True Label: 0
+Predicted Label: 1
+---
+Text: He is using it , and it is working .
+True Label: 0
+Predicted Label: 1
+---
+
+FALSE NEGATIVES:
+---------------
+Text: I fail to see how his religion has anything to do with it .
+True Label: 1
+Predicted Label: 0
+---
+Text: There you will see all your questions listed .
+True Label: 1
+Predicted Label: 0
+---
+Text: You will get a three day notice to pay or quit .
+True Label: 1
+Predicted Label: 0
+---
+Text: As they are not human , they have no rights .
+True Label: 1
+Predicted Label: 0
+---
+Text: Earth is the only planet known to have life .
+True Label: 1
+Predicted Label: 0
+---

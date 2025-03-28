@@ -1,0 +1,45 @@
+FALSE POSITIVES:
+---------------
+Text: He is using it , and it is working .
+True Label: 0
+Predicted Label: 1
+---
+Text: Or , you could try this website for your wedding etiquette on a budget .
+True Label: 0
+Predicted Label: 1
+---
+Text: You can not attain divinity because you are stupid .
+True Label: 0
+Predicted Label: 1
+---
+Text: There really is no lower limit .
+True Label: 0
+Predicted Label: 1
+---
+Text: Tea bags are cheap and they can make a lot of tea .
+True Label: 0
+Predicted Label: 1
+---
+
+FALSE NEGATIVES:
+---------------
+Text: No , he is a slave to the interpretations of the modern idiot/evangelist .
+True Label: 1
+Predicted Label: 0
+---
+Text: And the companies usually pay for ads on a `` per impression '' basis .
+True Label: 1
+Predicted Label: 0
+---
+Text: Here 's a listing of Canadian universities http://www.uwaterloo.ca/canu/ .
+True Label: 1
+Predicted Label: 0
+---
+Text: And it had all these different storys but they all connected some how .
+True Label: 1
+Predicted Label: 0
+---
+Text: To a point i agree .
+True Label: 1
+Predicted Label: 0
+---
