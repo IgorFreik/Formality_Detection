@@ -33,86 +33,35 @@ def filter_dataset(df):
     return df_filt
 
 
-def oversample_minority_class(df, label_column):
-    """
-    Oversample the minority class in a binary classification dataset.
-
-    Parameters:
-    -----------
-    df : pandas.DataFrame
-        Input dataframe containing features and label
-    label_column : str
-        Name of the column containing binary labels (0 or 1)
-
-    Returns:
-    --------
-    pandas.DataFrame
-        Dataframe with oversampled minority class
-    """
-    X = df.drop(columns=[label_column])
-    y = df[label_column]
-
-    oversampler = RandomOverSampler(random_state=42)
-    X_resampled, y_resampled = oversampler.fit_resample(X, y)
-
-    resampled_df = pd.DataFrame(X_resampled, columns=X.columns)
-    resampled_df[label_column] = y_resampled
-
-    return resampled_df
-
-
-def undersample_majority_class(df, label_column):
-    """
-    Undersample the majority class in a binary classification dataset.
-
-    Parameters:
-    -----------
-    df : pandas.DataFrame
-        Input dataframe containing features and label
-    label_column : str
-        Name of the column containing binary labels (0 or 1)
-
-    Returns:
-    --------
-    pandas.DataFrame
-        Dataframe with undersampled majority class
-    """
-    X = df.drop(columns=[label_column])
-    y = df[label_column]
-
-    undersampler = RandomUnderSampler(random_state=42)
-    X_resampled, y_resampled = undersampler.fit_resample(X, y)
-
-    resampled_df = pd.DataFrame(X_resampled, columns=X.columns)
-    resampled_df[label_column] = y_resampled
-
-    return resampled_df
-
-
 def balance_dataset(df, label_column, method='oversample'):
     """
-    Balance the dataset using either oversampling or undersampling.
+    Balance a binary classification dataset by resampling.
 
-    Parameters:
-    -----------
-    df : pandas.DataFrame
-        Input dataframe containing features and label
-    label_column : str
-        Name of the column containing binary labels (0 or 1)
-    method : str, optional (default='oversample')
-        Sampling method to use. Options are 'oversample' or 'undersample'
-
-    Returns:
-    --------
-    pandas.DataFrame
-        Balanced dataframe
+    :param df: DataFrame with features and labels
+    :param label_column: Name of the binary label column
+    :param method: Sampling method ('oversample' or 'undersample')
+    :return: Balanced DataFrame
     """
+    # Separate features and labels
+    X = df.drop(columns=[label_column])
+    y = df[label_column]
+
+    # Choose the appropriate sampler based on the method
     if method == 'oversample':
-        return oversample_minority_class(df, label_column)
+        sampler = RandomOverSampler(random_state=42)
     elif method == 'undersample':
-        return undersample_majority_class(df, label_column)
+        sampler = RandomUnderSampler(random_state=42)
     else:
         raise ValueError("Method must be either 'oversample' or 'undersample'")
+
+    # Resample the data
+    X_resampled, y_resampled = sampler.fit_resample(X, y)
+
+    # Reconstruct the dataframe
+    resampled_df = pd.DataFrame(X_resampled, columns=X.columns)
+    resampled_df[label_column] = y_resampled
+
+    return resampled_df
 
 
 if __name__ == '__main__':
@@ -123,17 +72,10 @@ if __name__ == '__main__':
         'email'
     ]
 
-    # Read and filter datasets
     dfs = [read_tsv(file_name) for file_name in file_names]
     dfs = [filter_dataset(df) for df in dfs]
-
-    # Analyze original dataset composition
     analyze_dataset_composition(dfs, file_names)
-
-    # Balance datasets using selected method
     dfs = [balance_dataset(df, 'label', method=SAMPLING_METHOD) for df in dfs]
-
-    # Combine and save the dataset
     df = pd.concat(dfs, ignore_index=True)
     print(f"Total samples: {len(df)}")
     df.to_csv("data/dataset.csv", index=False)
