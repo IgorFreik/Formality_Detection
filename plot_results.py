@@ -70,8 +70,10 @@ def print_incorrect_predictions(df, save_path='incorrect_predictions.txt'):
 
 
 if __name__ == "__main__":
+    os.makedirs("artifacts", exist_ok=True)
+
     for results_path in os.listdir("results"):
-        df = pd.read_csv(results_path)
-        plot_roc(df)
-        plot_confusion_matrix(df)
-        print_incorrect_predictions(df)
+        df = pd.read_csv(f"results/{results_path}")
+        plot_roc(df, f"artifacts/roc_curve_{results_path}.png")
+        plot_confusion_matrix(df, f"artifacts/confusion_matrix_{results_path}.png")
+        print_incorrect_predictions(df, f"artifacts/incorrect_predictions_{results_path}.txt")
