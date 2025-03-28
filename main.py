@@ -16,7 +16,7 @@ DETECTOR_CONFIGS = [
         "detector": RuleBasedDetector(),
     },
     {
-        "name": "roberta-base-formality-ranker",
+        "name": "deberta-large-formality-ranker",
         "detector": HuggingFaceFormalityDetector(model_name="s-nlp/deberta-large-formality-ranker", reverse_score=True),
     },
     {
