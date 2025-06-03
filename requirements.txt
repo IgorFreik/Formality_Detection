@@ -1,8 +1,0 @@
-pandas==2.2.3
-torch==2.2.2
-transformers==4.30.0
-spacy==3.5.4
-textstat==0.7.5
-scikit-learn==1.6.1
-matplotlib==3.10.1
-seaborn==0.13.2
