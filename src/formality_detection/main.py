@@ -1,110 +1,146 @@
-import sys
+"""Main entry point for formality detection evaluation."""
+
+import json
 from pathlib import Path
+from typing import Dict
 
 from loguru import logger
 
-from formality_detection.config.settings import settings
-from formality_detection.core.detectors import (
-    RuleBasedDetector,
+from .config import get_settings
+from .core import (
+    FormalityEvaluator,
     HuggingFaceFormalityDetector,
-    OpenAIFormalityDetector
-)
-from formality_detection.utils.helpers import (
-    load_dataset,
-    calculate_metrics,
-    save_json
+    OpenAIFormalityDetector,
+    RuleBasedDetector,
 )
 
 
-def setup_logging():
-    """Configure logging."""
-    logger.remove()
-    logger.add(
-        sys.stderr,
-        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>",
-        level="INFO"
-    )
-    logger.add(
-        settings.artifacts_dir / "logs" / "formality_detection_{time}.log",
-        rotation="1 day",
-        retention="7 days",
-        level="DEBUG"
-    )
-
-
-def create_detector(config: dict):
-    """
-    Create a formality detector based on configuration.
+def create_detector_configs() -> Dict:
+    """Create detector configurations based on settings."""
+    settings = get_settings()
     
-    Args:
-        config: Detector configuration dictionary
-        
-    Returns:
-        An instance of a formality detector
-    """
-    detector_type = config["type"]
+    configs = {
+        "rule-based": {
+            "detector": RuleBasedDetector(),
+            "description": "Rule-based detector using linguistic heuristics"
+        }
+    }
     
-    if detector_type == "rule_based":
-        return RuleBasedDetector()
-    elif detector_type == "huggingface":
-        return HuggingFaceFormalityDetector(
-            model_name=config["model_name"],
-            reverse_score=config.get("reverse_score", False)
-        )
-    elif detector_type == "openai":
-        if not settings.openai_api_key:
-            raise ValueError("OpenAI API key is required for OpenAI detector")
-        return OpenAIFormalityDetector(settings.openai_api_key)
+    # Add Hugging Face detectors
+    for name, config in settings.hf_models.items():
+        try:
+            configs[name] = {
+                "detector": HuggingFaceFormalityDetector(
+                    model_name=config["model_name"],
+                    reverse_score=config.get("reverse_score", False)
+                ),
+                "description": f"Hugging Face model: {config['model_name']}"
+            }
+        except Exception as e:
+            logger.error(f"Failed to initialize {name}: {e}")
+    
+    # Add OpenAI detector if API key is available
+    if settings.openai_api_key:
+        try:
+            configs["openai_gpt4o_mini"] = {
+                "detector": OpenAIFormalityDetector(),
+                "description": f"OpenAI model: {settings.openai_model}"
+            }
+        except Exception as e:
+            logger.error(f"Failed to initialize OpenAI detector: {e}")
     else:
-        raise ValueError(f"Unknown detector type: {detector_type}")
+        logger.warning("OpenAI API key not found, skipping OpenAI detector")
+    
+    return configs
 
 
-def main():
-    """Main entry point for the formality detection application."""
-    # Setup logging
-    setup_logging()
-    logger.info("Starting formality detection")
+def main() -> None:
+    """Main evaluation function."""
+    settings = get_settings()
     
-    # Create necessary directories
-    settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
-    (settings.artifacts_dir / "logs").mkdir(exist_ok=True)
+    # Setup paths
+    data_path = Path(settings.data_dir) / "dataset.csv"
+    if not data_path.exists():
+        logger.error(f"Dataset not found at {data_path}")
+        logger.info("Please ensure your dataset is available or run data preparation first")
+        return
     
-    # Load dataset
-    dataset_path = settings.data_dir / "dataset.csv"
-    df = load_dataset(dataset_path, max_samples=settings.max_samples)
-    logger.info(f"Loaded dataset with {len(df)} samples")
+    # Create output directory
+    results_dir = Path(settings.results_dir)
+    results_dir.mkdir(exist_ok=True)
     
-    # Process each detector
-    for config in settings.detector_configs:
-        detector_name = config["name"]
-        logger.info(f"Processing detector: {detector_name}")
+    # Initialize evaluator
+    evaluator = FormalityEvaluator(output_dir=str(results_dir))
+    
+    # Create detector configurations
+    detector_configs = create_detector_configs()
+    
+    if not detector_configs:
+        logger.error("No detectors available for evaluation")
+        return
+    
+    logger.info(f"Starting evaluation with {len(detector_configs)} detectors")
+    logger.info(f"Dataset: {data_path}")
+    logger.info(f"Max samples: {settings.max_samples}")
+    logger.info(f"Results directory: {results_dir}")
+    
+    # Evaluate each detector
+    all_metrics = {}
+    
+    for name, config in detector_configs.items():
+        logger.info(f"\n{'='*50}")
+        logger.info(f"Evaluating: {name}")
+        logger.info(f"Description: {config['description']}")
+        logger.info(f"{'='*50}")
         
         try:
-            # Create detector
-            detector = create_detector(config)
+            results_df, metrics = evaluator.evaluate_detector(
+                detector=config["detector"],
+                data_path=str(data_path),
+                detector_name=name,
+                max_samples=settings.max_samples,
+                save_results=True
+            )
             
-            # Get predictions
-            predictions = []
-            for text in df["text"]:
-                score = detector.detect_formality(text)
-                predictions.append(score)
+            all_metrics[name] = metrics
             
-            # Calculate metrics
-            metrics = calculate_metrics(predictions, df["formality_score"].tolist())
-            
-            # Save results
-            results_file = settings.artifacts_dir / f"metrics_{detector_name}.json"
-            save_json(metrics, results_file)
-            
-            logger.info(f"Completed processing {detector_name}")
-            logger.info(f"Metrics: {metrics}")
+            # Save individual metrics
+            metrics_path = results_dir / f"metrics_{name}.json"
+            with open(metrics_path, "w") as f:
+                json.dump(metrics, f, indent=2)
+            logger.info(f"Saved metrics to {metrics_path}")
             
         except Exception as e:
-            logger.error(f"Error processing detector {detector_name}: {e}")
+            logger.error(f"Error evaluating {name}: {e}")
             continue
     
-    logger.info("Formality detection completed")
+    # Create summary
+    if all_metrics:
+        logger.info(f"\n{'='*50}")
+        logger.info("EVALUATION SUMMARY")
+        logger.info(f"{'='*50}")
+        
+        # Sort by F1 score
+        sorted_results = sorted(
+            all_metrics.items(), 
+            key=lambda x: x[1].get('f1', 0), 
+            reverse=True
+        )
+        
+        for name, metrics in sorted_results:
+            logger.info(f"{name:25} | F1: {metrics.get('f1', 0):.4f} | "
+                       f"Acc: {metrics.get('accuracy', 0):.4f} | "
+                       f"AUC: {metrics.get('roc_auc', 0):.4f}")
+        
+        # Save summary
+        summary_path = results_dir / "evaluation_summary.json"
+        with open(summary_path, "w") as f:
+            json.dump(all_metrics, f, indent=2)
+        logger.info(f"\nSaved evaluation summary to {summary_path}")
+        
+    else:
+        logger.error("No successful evaluations completed")
 
 
 if __name__ == "__main__":
-    main() 
+    main()
