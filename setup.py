@@ -1,0 +1,45 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="formality_detection",
+    version="0.1.0",
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    install_requires=[
+        "spacy>=3.7.2",
+        "textstat>=0.7.3",
+        "transformers>=4.36.2",
+        "requests>=2.31.0",
+        "pandas>=2.1.4",
+        "numpy>=1.24.3",
+        "python-dotenv>=1.0.0",
+        "pydantic>=2.5.3",
+        "loguru>=0.7.2",
+        "scikit-learn>=1.3.2",
+    ],
+    extras_require={
+        "dev": [
+            "pytest>=7.4.3",
+            "black>=23.12.1",
+            "isort>=5.13.2",
+            "mypy>=1.8.0",
+        ],
+    },
+    python_requires=">=3.8",
+    author="Your Name",
+    author_email="your.email@example.com",
+    description="A package for detecting formality in text using various methods",
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
+    url="https://github.com/yourusername/formality_detection",
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    ],
+) 
