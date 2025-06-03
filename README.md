@@ -1,7 +1,6 @@
 # Formality Detection Project Documentation
 
 ## Scripts Description
-<!-- [Github Repository](https://github.com/IgorFreik/Formality_Detection) -->
 - `data_preparation.py` — Data preparation.
 - `formality_detector.py` — All approaches to formality detection wrapped in Python classes.
 - `evaluation.py` — Evaluation of given detectors on a given dataset.
@@ -108,16 +107,6 @@ To convert probabilistic predictions into binary classifications, an optimal cut
         - Splitting sentences & measuring average word length (no significant impact).
 
 ---
-
-<!-- ## How to run and reproduce results
-
-For instructions on running the project and reproducing the results, please refer to the GitHub repository’s README: -->
-
-
-<!-- [GitHub Repository](https://github.com/IgorFreik/Formality_Detection) -->
-
-
-
 # How to run
 
 1. Install the required libraries using the following command:
